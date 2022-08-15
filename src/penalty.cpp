@@ -15,10 +15,13 @@ float penalties::melodic_penalty(const Harmony harmonies[2], const FiguredBass b
   return penalty;
 }
 
+
 float penalties::omission_penalty(const Harmony* harmony, const FiguredBass* bass)
 {
-  /* crude version: simply check how many figures are missing */
-  /* improvement: check for "important" figures...(should be third and seventh) */
+  /*
+    idea: try to include as many figures as possible, and prioritize dissonances.
+    
+  */
 
   std::set<int> intervals;
   for (Figure figure : bass->figures)
