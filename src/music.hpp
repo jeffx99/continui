@@ -3,7 +3,8 @@
 #include <vector>
 #include <optional>
 
-enum class Mode {major, minor};
+enum Mode { MAJOR, MINOR };
+enum Accidental { DOUBLE_FLAT = -2, FLAT, NATURAL, SHARP, DOUBLE_SHARP};
 
 struct Key
 {
@@ -40,6 +41,9 @@ struct FiguredBass
   Note note;
   std::vector<Figure> figures;
 };
+
+/* Defined only for notes with a well defined scale degree */
+Note operator+(const Note note, const Figure figure);
 
 /* Conversion from scale degree to absolute note name */
 Note contextualize(Key key, Note note);

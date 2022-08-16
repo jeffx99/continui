@@ -16,6 +16,16 @@ Note Note::operator++(int)
   return *this;
 }
 
+/* Defined only for notes with a well defined scale degree */
+Note operator+(const Note note, const Figure figure)
+{
+  return {
+    .degree = (note.degree + figure.interval + 5) % 7 + 1 ,
+    .accidental = figure.accidental,
+    .octave = note.octave + (note.degree + figure.interval - 2) / 7
+  };
+}
+
 /* Conversion from scale degree to absolute note name */
 Note contextualize(Key key, Note note)
 {
@@ -29,10 +39,10 @@ Note contextualize(Key key, Note note)
 
   int* semi;
   switch (key.mode) {
-    case Mode::major:
+    case MAJOR:
       semi = major_semi;
       break;
-    case Mode::minor:
+    case MINOR:
       semi = minor_semi;
       break;
   }
@@ -40,7 +50,7 @@ Note contextualize(Key key, Note note)
   /*
     Sharpening:
       1. determine interval between key.letter and key.letter + note.degree
-      2. adjust with accidentals 
+      2. adjust with accidentals
   */
   int i = (key.letter - 'C' + 7) % 7;
   int j = (i + (note.degree - 1)) % 7;

@@ -1,10 +1,11 @@
 /* penalty.cpp */
 #include <set>
 #include <cmath>
+#include <optional>
 #include "penalty.hpp"
 
 
-float penalties::melodic_penalty(const Harmony harmonies[2], const FiguredBass bassline[2])
+float penalties::melodic_penalty(const Harmony harmonies[2], const FiguredBass bassline[2], Mode mode)
 {
   float penalty = 0;
   for (int i = 0; i < harmonies[0].size(); i++)
@@ -16,48 +17,95 @@ float penalties::melodic_penalty(const Harmony harmonies[2], const FiguredBass b
 }
 
 
-float penalties::omission_penalty(const Harmony* harmony, const FiguredBass* bass)
+float penalties::third_omission_penalty(const Harmony* harmony, const FiguredBass* bass, Mode mode)
 {
-  /*
-    idea: try to include as many figures as possible, and prioritize dissonances.
-    
-  */
+  std::optional<Figure> root = get_root(bass->figures);
 
-  std::set<int> intervals;
-  for (Figure figure : bass->figures)
-    if (figure.interval % 7 != 1)
-      intervals.insert(figure.interval % 7);
-
-  std::set<int> degrees;
-  for (Note note : *harmony)
-    if (note.degree != bass->note.degree)
-      degrees.insert(note.degree);
-
-  return intervals.size() - degrees.size();
-}
-
-float penalties::doubling_penalty(const Harmony* harmony, const FiguredBass* bass)
-{
-  /* crude version: penalize for doubling ^3 and ^7 (thirds of I and V) */
-  /* improvement: avoid doubling sevenths of chords as well*/
-
-  float weight_3 = 1;
-  float weight_7 = 100;
-
-  int count_3 = 0;
-  int count_7 = 0;
-  if (bass->note.degree == 3)
-    count_3 += 1;
-  if (bass->note.degree == 7)
-    count_7 += 1;
-
-  for (Note note : *harmony)
+  if (root)
   {
-    if (note.degree == 3)
-      count_3 += 1;
-    if (note.degree == 7)
-      count_7 += 1;
+    Note third = (bass->note + root.value()) + Figure{3};
+    if (bass->note.degree == third.degree)
+      return 0;
+
+    for (Note note : *harmony)
+      if (note.degree == third.degree)
+        return 0;
   }
 
-  return weight_3 * std::max(count_3 - 1, 0) + weight_7 * std::max(count_7 - 1, 0);
+  return 1;
+}
+
+float penalties::seventh_omission_penalty(const Harmony* harmony, const FiguredBass* bass, Mode mode)
+{
+  std::optional<Figure> root = get_root(bass->figures);
+
+  if (root)
+  {
+    Note seventh = (bass->note + root.value()) + Figure{7};
+    if (bass->note.degree == seventh.degree)
+      return 0;
+
+    for (Note note : *harmony)
+      if (note.degree == seventh.degree)
+        return 0;
+  }
+
+  return 1;
+}
+
+float penalties::dissonant_omission_penalty(const Harmony* harmony, const FiguredBass* bass, Mode mode)
+{
+  static std::set<int> dissonant_suspensions {4, 7, 9};
+  std::set<int> missing;
+
+  for (Figure figure : bass->figures)
+  {
+    if (dissonant_suspensions.contains(figure.interval))
+    {
+      Note note = bass->note + figure;
+      missing.insert(note.degree);
+    }
+  }
+  for (Note note : *harmony)
+      missing.erase(note.degree);
+
+  return missing.size();
+}
+
+float penalties::third_doubling_penalty(const Harmony* harmony, const FiguredBass* bass, Mode mode)
+{
+  std::optional<Figure> root = get_root(bass->figures);
+  int penalty = -1;
+
+  if (root)
+  {
+    Note third = (bass->note + root.value()) + Figure{3};
+    if (bass->note.degree == third.degree)
+      penalty++;
+
+    for (Note note : *harmony)
+      if (note.degree == third.degree)
+        penalty++;
+  }
+
+  return penalty >= 0 ? penalty : 0;
+}
+
+float penalties::seventh_doubling_penalty(const Harmony* harmony, const FiguredBass* bass, Mode mode)
+{
+  std::optional<Figure> root = get_root(bass->figures);
+  int penalty = -1;
+
+  if (root)
+  {
+    Note seventh = (bass->note + root.value()) + Figure{7};
+    if (bass->note.degree == seventh.degree)
+      penalty++;
+
+    for (Note note : *harmony)
+      if (note.degree == seventh.degree)
+        penalty++;
+  }
+
+  return penalty >= 0 ? penalty : 0;
 }
