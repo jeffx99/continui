@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "assert.hpp"
 #include "../src/penalty.hpp"
 
@@ -22,7 +20,8 @@ void omission_penalty_with_ambiguous_quality()
     {.degree = 2, .octave = 3}
   };
 
-  float penalty = penalties::third_omission_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::third_omission_penalty.method(&chord, MAJOR);
   EXPECT(1, penalty);
 }
 
@@ -45,7 +44,8 @@ void omission_penalty_with_seventh_chord()
     {.degree = 6, .octave = 2}
   };
 
-  float penalty = penalties::seventh_omission_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::seventh_omission_penalty.method(&chord, MAJOR);
   EXPECT(1, penalty);
 }
 
@@ -67,7 +67,8 @@ void omission_penalty_with_ninth()
     {.degree = 4, .octave = 2}
   };
 
-  float penalty = penalties::dissonant_omission_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::dissonant_omission_penalty.method(&chord, MAJOR);
   EXPECT(1, penalty);
 }
 
@@ -90,7 +91,8 @@ void omission_penalty_with_fourth()
     {.degree = 5, .octave = 2}
   };
 
-  float penalty = penalties::dissonant_omission_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::dissonant_omission_penalty.method(&chord, MAJOR);
   EXPECT(1, penalty);
 }
 
@@ -115,7 +117,8 @@ void doubling_penalty_with_doubled_third()
     {.degree = 4, .octave = 2}
   };
 
-  float penalty = penalties::third_doubling_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::third_doubling_penalty.method(&chord, MAJOR);
   EXPECT(2, penalty);
 }
 
@@ -140,7 +143,8 @@ void doubling_penalty_with_doubled_seventh()
     {.degree = 4, .octave = 2}
   };
 
-  float penalty = penalties::seventh_doubling_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::seventh_doubling_penalty.method(&chord, MAJOR);
   EXPECT(1, penalty);
 }
 
@@ -165,7 +169,8 @@ void doubling_penalty_with_doubled_seventh_in_bass()
     {.degree = 1, .octave = 2}
   };
 
-  float penalty = penalties::seventh_doubling_penalty(&harmony, &bass, MAJOR);
+  Chord chord = {harmony, bass};
+  float penalty = penalties::seventh_doubling_penalty.method(&chord, MAJOR);
   EXPECT(1, penalty);
 }
 
