@@ -3,31 +3,37 @@
 #include "music.hpp"
 
 using Harmony = std::vector<Note>;
-using PenaltyType = float (const Harmony*, const FiguredBass*, Mode);
 
-struct Penalty
+struct Penalty {
+  int arity;
+  float (*method) (const Chord*, Mode);
+};
+
+struct WeightedPenalty
 {
-  int arity; /* number of harmonies considered */
-  float weight;
+  Penalty* penalty;
 
-  PenaltyType type;
+  float weight;
+  float exponent;
 };
 
 namespace penalties
 {
-  /* ARITY 1 */
 
+  extern const int foo;
+
+  /* ARITY 1 */
   /* omissions */
-  PenaltyType third_omission_penalty;
-  PenaltyType seventh_omission_penalty;
-  PenaltyType dissonant_omission_penalty;
+  extern const Penalty third_omission_penalty;
+  extern const Penalty seventh_omission_penalty;
+  extern const Penalty dissonant_omission_penalty;
 
   /* doublings */
-  PenaltyType third_doubling_penalty;
-  PenaltyType seventh_doubling_penalty;
+  extern const Penalty third_doubling_penalty;
+  extern const Penalty seventh_doubling_penalty;
 
   /* ARITY 2 */
-  PenaltyType motion_penalty;
-  PenaltyType melodic_penalty;
-  PenaltyType tendency_penalty;
+  extern const Penalty motion_penalty;
+  extern const Penalty melodic_penalty;
+  extern const Penalty tendency_penalty;
 }

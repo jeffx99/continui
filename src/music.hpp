@@ -3,6 +3,9 @@
 #include <vector>
 #include <optional>
 
+struct Note;
+using Harmony = std::vector<Note>;
+
 enum Mode { MAJOR, MINOR };
 enum Accidental { DOUBLE_FLAT = -2, FLAT, NATURAL, SHARP, DOUBLE_SHARP};
 
@@ -40,6 +43,12 @@ struct FiguredBass
 {
   Note note;
   std::vector<Figure> figures;
+};
+
+struct Chord
+{
+  Harmony harmony;
+  FiguredBass bass;
 };
 
 /* Defined only for notes with a well defined scale degree */
