@@ -30,12 +30,12 @@ extern const Penalty penalties::third_omission_penalty =
 
     if (root)
     {
-      Note third = (chord->bass.note + root.value()) + Figure{3};
-      if (chord->bass.note.degree == third.degree)
+      Pitch third = (chord->bass.pitch + root.value()) + Figure{3};
+      if (chord->bass.pitch.degree == third.degree)
         return 0;
 
-      for (Note note : chord->harmony)
-        if (note.degree == third.degree)
+      for (Pitch pitch : chord->harmony)
+        if (pitch.degree == third.degree)
           return 0;
     }
     return 1;
@@ -51,12 +51,12 @@ extern const Penalty penalties::seventh_omission_penalty =
 
     if (root)
     {
-      Note seventh = (chord->bass.note + root.value()) + Figure{7};
-      if (chord->bass.note.degree == seventh.degree)
+      Pitch seventh = (chord->bass.pitch + root.value()) + Figure{7};
+      if (chord->bass.pitch.degree == seventh.degree)
         return 0;
 
-      for (Note note : chord->harmony)
-        if (note.degree == seventh.degree)
+      for (Pitch pitch : chord->harmony)
+        if (pitch.degree == seventh.degree)
           return 0;
     }
 
@@ -76,12 +76,12 @@ extern const Penalty penalties::dissonant_omission_penalty
     {
       if (dissonant_suspensions.contains(figure.interval))
       {
-        Note note = chord->bass.note + figure;
-        missing.insert(note.degree);
+        Pitch pitch = chord->bass.pitch + figure;
+        missing.insert(pitch.degree);
       }
     }
-    for (Note note : chord->harmony)
-        missing.erase(note.degree);
+    for (Pitch pitch : chord->harmony)
+        missing.erase(pitch.degree);
 
     return missing.size();
   }
@@ -97,12 +97,12 @@ extern const Penalty penalties::third_doubling_penalty =
 
     if (root)
     {
-      Note third = (chord->bass.note + root.value()) + Figure{3};
-      if (chord->bass.note.degree == third.degree)
+      Pitch third = (chord->bass.pitch + root.value()) + Figure{3};
+      if (chord->bass.pitch.degree == third.degree)
         penalty++;
 
-      for (Note note : chord->harmony)
-        if (note.degree == third.degree)
+      for (Pitch pitch : chord->harmony)
+        if (pitch.degree == third.degree)
           penalty++;
     }
 
@@ -120,12 +120,12 @@ extern const Penalty penalties::seventh_doubling_penalty =
 
     if (root)
     {
-      Note seventh = (chord->bass.note + root.value()) + Figure{7};
-      if (chord->bass.note.degree == seventh.degree)
+      Pitch seventh = (chord->bass.pitch + root.value()) + Figure{7};
+      if (chord->bass.pitch.degree == seventh.degree)
         penalty++;
 
-      for (Note note : chord->harmony)
-        if (note.degree == seventh.degree)
+      for (Pitch pitch : chord->harmony)
+        if (pitch.degree == seventh.degree)
           penalty++;
     }
 

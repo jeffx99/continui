@@ -3,8 +3,8 @@
 #include <vector>
 #include <optional>
 
-struct Note;
-using Harmony = std::vector<Note>;
+struct Pitch;
+using Harmony = std::vector<Pitch>;
 
 enum Mode { MAJOR, MINOR };
 enum Accidental { DOUBLE_FLAT = -2, FLAT, NATURAL, SHARP, DOUBLE_SHARP};
@@ -17,7 +17,7 @@ struct Key
   Mode mode;
 };
 
-struct Note
+struct Pitch
 {
   union
   {
@@ -30,7 +30,7 @@ struct Note
 
 
   operator int() const { return degree + 7 * octave; };
-  Note operator ++(int);
+  Pitch operator ++(int);
 };
 
 struct Figure
@@ -41,7 +41,7 @@ struct Figure
 
 struct FiguredBass
 {
-  Note note;
+  Pitch pitch;
   std::vector<Figure> figures;
 };
 
@@ -51,11 +51,12 @@ struct Chord
   FiguredBass bass;
 };
 
-/* Defined only for notes with a well defined scale degree */
-Note operator+(const Note note, const Figure figure);
+/* Defined only for pitchs with a well defined scale degree */
+Pitch operator+(const Pitch pitch, const Figure figure);
 
-/* Conversion from scale degree to absolute note name */
-Note contextualize(Key key, Note note);
+/* Conversion from scale degree to absolute pitch name */
+Pitch relative_to_absolute(Key key, Pitch pitch);
+Pitch absolute_to_relative(Key key, Pitch pitch);
 
 /* Applicable only to inversions of the triad or seventh (w/ possible suspended ninth) */
 std::optional<Figure> get_root(std::vector<Figure> figures);

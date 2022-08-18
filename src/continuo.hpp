@@ -1,31 +1,28 @@
 /* continuo.hpp */
 #pragma once
+#include <map>
 #include "music.hpp"
 #include "penalty.hpp"
 
-using Harmony = std::vector<Note>;
-
-class Realization
+class HarmonicRealization
 {
 private:
-  int voices;
-  std::vector<std::pair<Note, Note>> ranges;
-
-  std::vector<Harmony> harmonies;
-  std::vector<FiguredBass> bassline;
-
-  bool harmonic(Note note, FiguredBass bass);
-
   Harmony initial_harmony(FiguredBass bass);
   bool harmonic_successor(Harmony& harmony, FiguredBass bass);
 
   std::pair<float, std::vector<Harmony>> dp(float badness, int level);
 
 public:
-  std::vector<Penalty> penalties;
+  int depth;
+  int progress = 0;
 
-  Realization(int voices, std::vector<std::pair<Note, Note>> ranges, std::vector<FiguredBass> bassline);
-  float realize(int depth);
+  int voices;
+  Mode mode;
 
-  Note get_note(int voice, int index);
+  std::vector<std::pair<Note, Note>> ranges; /* from lowest to highest */
+  std::map<std::string, Rule> rules;
+
+  std::vector<Chord> progression;
+
+  float realize();
 };

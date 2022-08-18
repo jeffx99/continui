@@ -5,7 +5,7 @@ void omission_penalty_with_ambiguous_quality()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 5},
+    .pitch = {.degree = 5},
     .figures =
     {
       {7},
@@ -29,7 +29,7 @@ void omission_penalty_with_seventh_chord()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 4},
+    .pitch = {.degree = 4},
     .figures =
     {
       {6},
@@ -53,7 +53,7 @@ void omission_penalty_with_ninth()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 4},
+    .pitch = {.degree = 4},
     .figures =
     {
       {9},
@@ -77,7 +77,7 @@ void omission_penalty_with_fourth()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 1},
+    .pitch = {.degree = 1},
     .figures =
     {
       {5},
@@ -100,7 +100,7 @@ void doubling_penalty_with_doubled_third()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 7},
+    .pitch = {.degree = 7},
     .figures =
     {
       {6},
@@ -126,7 +126,7 @@ void doubling_penalty_with_doubled_seventh()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 2},
+    .pitch = {.degree = 2},
     .figures =
     {
       {6},
@@ -152,7 +152,7 @@ void doubling_penalty_with_doubled_seventh_in_bass()
 {
   FiguredBass bass =
   {
-    .note = {.degree = 1},
+    .pitch = {.degree = 1},
     .figures =
     {
       {6},

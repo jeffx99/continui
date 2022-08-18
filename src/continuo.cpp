@@ -4,8 +4,6 @@
 #include <iostream>
 #include "continuo.hpp"
 
-Realization::Realization(int voices, std::vector<std::pair<Note, Note>> ranges, std::vector<FiguredBass> bassline) : voices(voices), ranges(ranges), bassline(bassline) {};
-
 /*
   Given a bass note and figures, generate all possible n-voice harmonies.
   To do this, we order all the harmonies and construct an initial harmony.
@@ -21,16 +19,21 @@ Realization::Realization(int voices, std::vector<std::pair<Note, Note>> ranges, 
       and then moves the lower voices up as far as a possible
     Hence proving the claim... (succ can actually be extended to a bijection cyclically permuting things)
 */
-bool Realization::harmonic(Note note, FiguredBass bass)
+bool harmonic(Note& note, FiguredBass bass)
 {
   for (Figure figure : bass.figures)
-    if ((figure.interval - 1) % 7 == (note - bass.note) % 7)
+  {
+    Note other = bass.note + figure;
+    if (note.degree == other.degree)
+    {
+      note.accidental = other.accidental;
       return true;
-
+    }
+  }
   return false;
 }
 
-Harmony Realization::initial_harmony(FiguredBass bass)
+Harmony HarmonicRealization::initial_harmony(FiguredBass bass)
 {
   Harmony harmony;
   for (int i = 0; i < voices; i++)
@@ -53,7 +56,7 @@ Harmony Realization::initial_harmony(FiguredBass bass)
   return harmony;
 }
 
-bool Realization::harmonic_successor(Harmony& harmony, FiguredBass bass)
+bool HarmonicRealization::harmonic_successor(Harmony& harmony, FiguredBass bass)
 {
   Harmony initial = initial_harmony(bass);
 
@@ -76,32 +79,32 @@ bool Realization::harmonic_successor(Harmony& harmony, FiguredBass bass)
   return false;
 }
 
-std::pair<float, std::vector<Harmony>> Realization::dp(float badness, int level)
+std::pair<float, std::vector<Harmony>> HarmonicRealization::dp(float badness, int level)
 {
-  /* DP (DFS + memoization): find realization of the next [depth] bass notes with the least badness */
+  /* DP: find realization of the next [depth] bass notes with the least badness */
 
-  if (harmonies.size() == bassline.size() || level == 0)
+  if (progress == progression.size() || level == 0)
     return {badness, {}};
 
   float minimum = -1;
   std::vector<Harmony> solution;
 
-  Harmony current_harmony = initial_harmony(bassline.at(harmonies.size()));
+  Harmony current_harmony = initial_harmony(progression[progress].bass);
   do
   {
-    harmonies.push_back(current_harmony);
+    progression[progress++].harmony = current_harmony;
 
     /* calculate badness */
     float delta = 0;
-    for (Penalty penalty : penalties)
+    for (auto const& [key, rule] : rules)
     {
       /* check if penalty is applicable */
-      if (harmonies.size() < penalty.arity)
+      if (progress < rule.penalty->arity)
         continue;
 
       /* apply penalty */
-      int j = harmonies.size() - penalty.arity;
-      delta += penalty.weight * penalty.method(&harmonies[j], &bassline[j]);
+      int j = progress - rule.penalty->arity;
+      delta += rule.weight * rule.penalty->method(&progression[progress], mode);
 
       /* prune if delta is too large */
     }
@@ -115,30 +118,26 @@ std::pair<float, std::vector<Harmony>> Realization::dp(float badness, int level)
     if (score < minimum || minimum == -1)
       std::tie(minimum, solution) = {score, tentative};
 
-    harmonies.pop_back();
-  } while(harmonic_successor(current_harmony, bassline.at(harmonies.size())));
+    progression[--progress].harmony = {};
+  } while(harmonic_successor(current_harmony, progression[progress].bass));
 
   return {minimum, solution};
 }
 
-float Realization::realize(int depth)
+float HarmonicRealization::realize()
 {
   float badness = 0;
 
-  while (harmonies.size() != bassline.size())
+  while (progress < progression.size())
   {
     float delta;
-    std::vector<Harmony> progression;
-    std::tie(delta, progression) = dp(0, depth);
+    std::vector<Harmony> solution;
+    std::tie(delta, solution) = dp(0, depth);
 
     badness += delta;
-    harmonies.insert(harmonies.end(), progression.rbegin(), progression.rend());
+    for (int i = 0; i < solution.size(); ++i)
+      progression[progress++].harmony = solution[i];
   }
 
   return badness;
-}
-
-Note Realization::get_note(int voice, int index)
-{
-  return harmonies[index][voice];
 }

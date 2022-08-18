@@ -6,36 +6,19 @@
 
 int main(int argc, char** argv)
 {
-  std::vector<FiguredBass> bassline =
-  {
-    {{1, 2}, {{8}, {5}, {3}}},
-    {{7, 1}, {{6}, {3}}},
-    {{6, 1}, {{6}, {4}, {3}}},
-    {{5, 1}, {{7}, {5}, {3}}},
-    {{1, 1}, {{8}, {5}, {3}}}
-  };
+  /*
+    Note:
 
-  /* tenor, alto, soprano */
-  std::vector<std::pair<Note, Note>> ranges =
-  {
-    {{1, 1}, {5, 2}},
-    {{5, 1}, {1, 3}},
-    {{1, 2}, {5, 3}}
-  };
+    - Given a bassline:
+      - Take the bass notes with figures (essential basses)
+        - record the durations between such notes
+      - Split into segments in the same local Key
+      - Harmonically realize each segment
+      - Create voicelines based on Realization
+      - Add passing tones
+        - Whenever a leap of a third is made across the distance of a beat fill it in.
+  */
 
-  Realization continuo(3, ranges, bassline);
-  continuo.penalties.push_back({2, 0.5, penalties::melodic_penalty});
-  continuo.penalties.push_back({1, 3, penalties::omission_penalty});
-  continuo.penalties.push_back({1, 2, penalties::doubling_penalty});
 
-  std::cout << "badness: " << continuo.realize(3) << std::endl;
-
-  std::cout << "realization:" << std::endl;
-  for (int i = 2; i >= 0; i--)
-  {
-    for (int j = 0; j < bassline.size(); j++)
-      std::cout << continuo.get_note(i, j).degree << "." << continuo.get_note(i, j).octave << " ";
-
-    std:: cout << std::endl;
-  }
+  
 }

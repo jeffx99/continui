@@ -3,76 +3,92 @@
 #include "assert.hpp"
 #include "../src/music.hpp"
 
-void note_addition_with_natural_figure()
+void pitch_addition_with_natural_figure()
 {
-  Note note = {.degree = 3, .accidental = 1, .octave = 2};
+  Pitch pitch = {.degree = 3, .accidental = 1, .octave = 2};
   Figure figure = {5};
 
-  Note result = note + figure;
+  Pitch result = pitch + figure;
 
   EXPECT(7, result.degree);
   EXPECT(0, result.accidental);
   EXPECT(2, result.octave);
 }
 
-void note_addition_with_sharp_figure()
+void pitch_addition_with_sharp_figure()
 {
-  Note note = {.degree = 1, .accidental = 0, .octave = 3};
+  Pitch pitch = {.degree = 1, .accidental = 0, .octave = 3};
   Figure figure = {4, SHARP};
 
-  Note result = note + figure;
+  Pitch result = pitch + figure;
 
   EXPECT(4, result.degree);
   EXPECT(1, result.accidental);
   EXPECT(3, result.octave);
 }
 
-void note_addition_with_increasing_octave()
+void pitch_addition_with_increasing_octave()
 {
-  Note note = {.degree = 5, .accidental = 0, .octave = 2};
+  Pitch pitch = {.degree = 5, .accidental = 0, .octave = 2};
   Figure figure = {5};
 
-  Note result = note + figure;
+  Pitch result = pitch + figure;
 
   EXPECT(2, result.degree);
   EXPECT(0, result.accidental);
   EXPECT(3, result.octave);
 }
 
-void note_conversion_with_natural_key_and_degree()
+void pitch_conversion_with_natural_key_and_degree()
 {
   Key key = {.letter = 'D', .accidental = 0, .mode = MAJOR};
-  Note note = {.degree = 4, .accidental = 0, .octave = 3};
+  Pitch pitch = {.degree = 4, .accidental = 0, .octave = 3};
 
-  Note result = contextualize(key, note);
+  Pitch result = relative_to_absolute(key, pitch);
+  Pitch original = absolute_to_relative(key, result);
 
   EXPECT('G', result.letter);
   EXPECT(0, result.accidental);
   EXPECT(5, result.octave);
+
+  EXPECT(4, original.degree);
+  EXPECT(0, original.accidental);
+  EXPECT(3, original.octave);
 }
 
-void note_conversion_with_flat_key_sharp_degree()
+void pitch_conversion_with_flat_key_sharp_degree()
 {
   Key key = {.letter = 'E', .accidental = -1, .mode = MINOR};
-  Note note = {.degree = 7, .accidental = 1, .octave = 2};
+  Pitch pitch = {.degree = 7, .accidental = 1, .octave = 2};
 
-  Note result = contextualize(key, note);
+  Pitch result = relative_to_absolute(key, pitch);
+  Pitch original = absolute_to_relative(key, result);
 
   EXPECT('D', result.letter);
   EXPECT(0, result.accidental);
   EXPECT(5, result.octave);
+
+
+  EXPECT(7, original.degree);
+  EXPECT(1, original.accidental);
+  EXPECT(2, original.octave);
 }
 
-void note_conversion_with_sharp_key_sharp_degree()
+void pitch_conversion_with_sharp_key_sharp_degree()
 {
   Key key = {.letter = 'F', .accidental = 1, .mode = MINOR};
-  Note note = {.degree = 3, .accidental = 1, .octave = 3};
+  Pitch pitch = {.degree = 3, .accidental = 1, .octave = 3};
 
-  Note result = contextualize(key, note);
+  Pitch result = relative_to_absolute(key, pitch);
+  Pitch original = absolute_to_relative(key, result);
 
   EXPECT('A', result.letter);
   EXPECT(1, result.accidental);
   EXPECT(5, result.octave)
+
+  EXPECT(3, original.degree);
+  EXPECT(1, original.accidental);
+  EXPECT(3, original.octave);
 }
 
 void figured_bass_root_with_triad()
@@ -116,13 +132,13 @@ void figured_bass_root_with_non_harmonic_bass()
 
 int main(int argc, char **argv)
 {
-  note_addition_with_natural_figure();
-  note_addition_with_sharp_figure();
-  note_addition_with_increasing_octave();
+  pitch_addition_with_natural_figure();
+  pitch_addition_with_sharp_figure();
+  pitch_addition_with_increasing_octave();
 
-  note_conversion_with_natural_key_and_degree();
-  note_conversion_with_flat_key_sharp_degree();
-  note_conversion_with_sharp_key_sharp_degree();
+  pitch_conversion_with_natural_key_and_degree();
+  pitch_conversion_with_flat_key_sharp_degree();
+  pitch_conversion_with_sharp_key_sharp_degree();
 
   figured_bass_root_with_triad();
   figured_bass_root_with_seventh();

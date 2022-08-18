@@ -2,14 +2,14 @@
 #pragma once
 #include "music.hpp"
 
-using Harmony = std::vector<Note>;
+using Harmony = std::vector<Pitch>;
 
 struct Penalty {
   int arity;
   float (*method) (const Chord*, Mode);
 };
 
-struct WeightedPenalty
+struct Rule
 {
   Penalty* penalty;
 
