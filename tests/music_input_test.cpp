@@ -16,8 +16,12 @@ void read_arbitrary_object(std::string name)
 
 int main(int argc, char **argv)
 {
+
   read_arbitrary_object<rational>("rational");
   read_arbitrary_object<Pitch>("pitch");
   read_arbitrary_object<Note>("note");
+  read_arbitrary_object<Figure>("figure");
+  read_arbitrary_object<std::vector<Figure>>("figures");
+
   return 0;
 }

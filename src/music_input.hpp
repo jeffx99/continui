@@ -2,6 +2,7 @@
 #pragma once
 #include <istream>
 #include <ostream>
+#include <vector>
 #include "music.hpp"
 #include "bassline.hpp"
 
@@ -13,6 +14,14 @@ std::ostream& operator<<(std::ostream&, Pitch);
 
 std::istream& operator>>(std::istream&, Note&);
 std::ostream& operator<<(std::ostream&, Note);
+
+std::istream& operator>>(std::istream&, Figure&);
+std::ostream& operator<<(std::ostream&, Figure);
+
+std::istream& operator>>(std::istream&, std::vector<Figure>&);
+std::ostream& operator<<(std::ostream&, std::vector<Figure>);
+
+
 
 /*
   Parsing rules:
