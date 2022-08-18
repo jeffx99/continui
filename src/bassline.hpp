@@ -27,4 +27,4 @@ struct VoiceLine
 {
   Meter meter;
   std::vector<Note> notes;
-}
+};
