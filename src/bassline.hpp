@@ -9,22 +9,27 @@
     - A given meter (for now this is just 4/4)?
     - A series of notes with durations attached (either relative or absolute pitches)
 */
-using duration = rational;
-
-struct Note
-{
-  Pitch pitch;
-  duration value;
-};
+struct Note;
+using VoiceLine = std::vector<Note>;
 
 struct Meter
 {
   int multiple;
-  duration beat;
+  rational beat;
 };
 
-struct VoiceLine
+struct Note
 {
+  Pitch pitch;
+  rational value;
+};
+
+struct Segment
+{
+  Key key;
   Meter meter;
-  std::vector<Note> notes;
+
+  std::vector<VoiceLine> lines = {{}};
+
+  std::vector<std::pair<FiguredBass, rational>> essential_basses;
 };

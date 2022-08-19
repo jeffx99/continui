@@ -13,7 +13,7 @@ extern const Penalty penalties::melodic_penalty =
     float penalty = 0;
     for (int i = 0; i < chords[0].harmony.size(); i++)
     {
-      penalty += std::abs(chords[1].harmony[i] - chords[0].harmony[i]);
+      penalty += std::abs(chords[0].harmony[i] - chords[-1].harmony[i]);
     }
 
     return penalty;

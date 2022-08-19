@@ -5,7 +5,7 @@
 #include "continuo.hpp"
 
 /*
-  Given a bass note and figures, generate all possible n-voice harmonies.
+  Given a bass pitch and figures, generate all possible n-voice harmonies.
   To do this, we order all the harmonies and construct an initial harmony.
   The successor function:
     Take the lowest voice and move it up to the next chord tone.
@@ -19,14 +19,15 @@
       and then moves the lower voices up as far as a possible
     Hence proving the claim... (succ can actually be extended to a bijection cyclically permuting things)
 */
-bool harmonic(Note& note, FiguredBass bass)
+bool make_harmonic(Pitch& pitch, FiguredBass bass)
 {
+  bass.figures.push_back({8, bass.pitch.accidental});
   for (Figure figure : bass.figures)
   {
-    Note other = bass.note + figure;
-    if (note.degree == other.degree)
+    Pitch other = bass.pitch + figure;
+    if (pitch.degree == other.degree)
     {
-      note.accidental = other.accidental;
+      pitch.accidental = other.accidental;
       return true;
     }
   }
@@ -37,18 +38,18 @@ Harmony HarmonicRealization::initial_harmony(FiguredBass bass)
 {
   Harmony harmony;
   for (int i = 0; i < voices; i++)
-    harmony.push_back((ranges[i].first >= bass.note) ? ranges[i].first : bass.note);
+    harmony.push_back((ranges[i].first >= bass.pitch) ? ranges[i].first : bass.pitch);
 
   for (int i = voices - 1; i >= 0; i--)
   {
-    Note limit = ranges[i].second;
+    Pitch limit = ranges[i].second;
     if (i + 1 < voices && harmony[i + 1] < limit)
       limit = harmony[i + 1];
 
     while (harmony[i] < limit)
     {
       harmony[i]++;
-      if (harmonic(harmony[i], bass))
+      if (make_harmonic(harmony[i], bass))
         break;
     }
   }
@@ -62,14 +63,14 @@ bool HarmonicRealization::harmonic_successor(Harmony& harmony, FiguredBass bass)
 
   for (int i = 0; i < voices; i++)
   {
-    Note limit = ranges[i].second;
+    Pitch limit = ranges[i].second;
     if (i + 1 < voices && harmony[i + 1] < limit)
       limit = harmony[i + 1];
 
     while (harmony[i] < limit)
     {
       harmony[i]++;
-      if (harmonic(harmony[i], bass))
+      if (make_harmonic(harmony[i], bass))
         return true;
     }
     /* else */
@@ -79,9 +80,9 @@ bool HarmonicRealization::harmonic_successor(Harmony& harmony, FiguredBass bass)
   return false;
 }
 
-std::pair<float, std::vector<Harmony>> HarmonicRealization::dp(float badness, int level)
+std::pair<float, std::vector<Harmony>> HarmonicRealization::dp(float threshold, float badness, int level)
 {
-  /* DP: find realization of the next [depth] bass notes with the least badness */
+  /* DP: find realization of the next [depth] bass pitchs with the least badness */
 
   if (progress == progression.size() || level == 0)
     return {badness, {}};
@@ -92,52 +93,69 @@ std::pair<float, std::vector<Harmony>> HarmonicRealization::dp(float badness, in
   Harmony current_harmony = initial_harmony(progression[progress].bass);
   do
   {
-    progression[progress++].harmony = current_harmony;
+    progression[progress].harmony = current_harmony;
+    bool surpassed = false;
 
     /* calculate badness */
     float delta = 0;
-    for (auto const& [key, rule] : rules)
+    for (Rule const& rule : rules)
     {
       /* check if penalty is applicable */
-      if (progress < rule.penalty->arity)
+      if (progress + 1 < rule.penalty->arity)
         continue;
 
       /* apply penalty */
-      int j = progress - rule.penalty->arity;
       delta += rule.weight * rule.penalty->method(&progression[progress], mode);
 
       /* prune if delta is too large */
+      if (badness + delta >= threshold && threshold >= 0)
+      {
+        surpassed = true;
+        break;
+      }
     }
+
+    if (surpassed)
+      continue;
 
     /* solve subproblems */
     float score;
     std::vector<Harmony> tentative;
-    std::tie(score, tentative) = dp(badness + delta, level - 1);
+
+    ++progress;
+    std::tie(score, tentative) = dp(threshold, badness + delta, level - 1);
     tentative.push_back(current_harmony);
 
     if (score < minimum || minimum == -1)
       std::tie(minimum, solution) = {score, tentative};
 
-    progression[--progress].harmony = {};
+    if (minimum < threshold || threshold == -1)
+      threshold = minimum;
+
+    --progress;
+    progression[progress].harmony = {};
   } while(harmonic_successor(current_harmony, progression[progress].bass));
 
-  return {minimum, solution};
+  if (minimum == -1)
+    return {threshold + 1, {}};
+  else
+    return {minimum, solution};
 }
 
 float HarmonicRealization::realize()
 {
   float badness = 0;
-
-  while (progress < progression.size())
+  do
   {
     float delta;
     std::vector<Harmony> solution;
-    std::tie(delta, solution) = dp(0, depth);
+    std::tie(delta, solution) = dp(-1, 0, depth);
 
     badness += delta;
-    for (int i = 0; i < solution.size(); ++i)
+    for (int i = solution.size() - 1; i >= 0; --i)
       progression[progress++].harmony = solution[i];
-  }
+
+  } while (progress < progression.size() - 1);
 
   return badness;
 }

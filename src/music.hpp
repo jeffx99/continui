@@ -14,7 +14,7 @@ struct Key
   char letter;
   int accidental;
 
-  Mode mode;
+  Mode mode = MAJOR;
 };
 
 struct Pitch

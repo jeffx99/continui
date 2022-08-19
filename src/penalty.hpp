@@ -11,7 +11,7 @@ struct Penalty {
 
 struct Rule
 {
-  Penalty* penalty;
+  const Penalty* penalty;
 
   float weight;
   float exponent;

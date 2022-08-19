@@ -25,6 +25,57 @@ std::ostream& operator<<(std::ostream& os, rational r)
   return os;
 }
 
+std::istream& operator>>(std::istream& is, Meter& meter)
+{
+  is >> meter.multiple;
+
+  if (is.peek() != 'x')
+    std::cout << "invalid note delimiter: "/* + (char)is.peek()*/ << std::endl;
+
+  is.ignore();
+  is >> meter.beat;
+  return is;
+}
+
+std::ostream& operator<<(std::ostream& os, Meter meter)
+{
+  os << meter.multiple << 'x' << meter.beat;
+  return os;
+}
+
+std::istream& operator>>(std::istream& is, Key& key)
+{
+  char ficta;
+  int amount = 0;
+  int multiplier;
+
+  is >> key.letter;
+  if (key.letter >= 'a')
+  {
+    key.letter = (key.letter - 'a') + 'A';
+    key.mode = MINOR;
+  }
+
+
+  if (is.peek() == '#' || is.peek() == 'b')
+  {
+    ficta = is.peek();
+    while (is.peek() == ficta)
+    {
+      is.ignore();
+      ++amount;
+    }
+  }
+
+  if (ficta == '#')
+    multiplier = +1;
+  if (ficta == 'b')
+    multiplier = -1;
+
+  key.accidental = amount * multiplier;
+  return is;
+}
+
 
 std::istream& operator>>(std::istream& is, Pitch& pitch)
 {
@@ -68,9 +119,8 @@ std::ostream& operator<<(std::ostream& os, Pitch pitch)
 std::istream& operator>>(std::istream& is, Note& note)
 {
   is >> note.pitch;
-
   if (is.peek() != ':')
-    throw std::invalid_argument("invalid note delimiter: " + (char)is.peek());
+    std::cout << "invalid note delimiter for " << note.pitch /* + (char)is.peek() */<< std::endl;
 
   is.ignore();
   is >> note.value;
@@ -131,6 +181,7 @@ std::istream& operator>>(std::istream& is, std::vector<Figure>& figures)
     figures.push_back(figure);
     is >> std::ws;
   }
+  is.ignore();
   return is;
 }
 
