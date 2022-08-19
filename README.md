@@ -16,6 +16,7 @@ e: E2:1/8;<5 3> F#2:1/8 G2:1/8;<6 3> A2:1/8 B2:1/8;<5 3#> C#3:1/8;<7 3> D#3:1/8;
 ```
 
 This produces the following realization:
+
 ![realization](realization.png)
 
 Note the parallel octaves between the bass and tenor; this is due to the fact that contrapuntal errors have not been yet(but will soon be!) added to the penalty/badness calculation.
